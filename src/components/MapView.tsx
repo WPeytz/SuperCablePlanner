@@ -191,6 +191,7 @@ export default function MapView({
 
   return (
     <div
+      data-tour="map"
       className={`map-wrap ${drawMode ? 'map-drawing' : ''} ${noteMode ? 'map-note-adding' : ''}`}
     >
       <svg

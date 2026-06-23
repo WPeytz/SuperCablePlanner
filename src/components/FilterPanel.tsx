@@ -14,7 +14,7 @@ interface Props {
 export default function FilterPanel({ active, onToggle }: Props) {
   const count = Object.values(active).filter(Boolean).length
   return (
-    <div className="panel">
+    <div className="panel" data-tour="considerations">
       <h3 className="panel-title">
         Considerations
         <span className="count">{count}/{CONSIDERATIONS.length}</span>

@@ -845,6 +845,97 @@ button {
   font-family: var(--mono);
 }
 
+/* ---- Guided tour -------------------------------------------------------- */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.tour-fulldim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 18, 34, 0.64);
+  animation: tour-fade 0.2s ease;
+}
+.tour-spotlight {
+  position: fixed;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(8, 18, 34, 0.64);
+  border: 2px solid rgba(14, 165, 233, 0.95);
+  pointer-events: none;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tour-card {
+  position: fixed;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  padding: 17px 18px 14px;
+  animation: tour-pop 0.22s ease;
+}
+@keyframes tour-fade {
+  from { opacity: 0; }
+}
+@keyframes tour-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+}
+.tour-kicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+}
+.tour-step-icon {
+  font-size: 15px;
+}
+.tour-title {
+  font-size: 17px;
+  margin: 8px 0 6px;
+  color: var(--ink-700);
+}
+.tour-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-500);
+  margin: 0 0 14px;
+}
+.tour-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 13px;
+}
+.tour-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--steel-300);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tour-dot.on {
+  background: var(--accent);
+  width: 20px;
+  border-radius: 5px;
+}
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.help-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 50%;
+}
+
 /* ---- Field / form ------------------------------------------------------- */
 .field-label {
   font-size: 12px;

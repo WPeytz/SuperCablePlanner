@@ -19,7 +19,7 @@ export default function Sidebar({
 }: Props) {
   return (
     <aside className="col col-left">
-      <div className="panel">
+      <div className="panel" data-tour="layers">
         <h3 className="panel-title">
           Map layers
           <span className="count">{Object.values(visibleLayers).filter(Boolean).length}/{LAYERS.length}</span>

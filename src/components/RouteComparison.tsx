@@ -53,7 +53,7 @@ export default function RouteComparison({
   }
 
   return (
-    <div className="panel">
+    <div className="panel" data-tour="comparison">
       <h3 className="panel-title">Route comparison</h3>
       {rows.length === 0 ? (
         <p className="empty-hint">All considerations are excluded — enable at least one in the Considerations panel to compare routes.</p>

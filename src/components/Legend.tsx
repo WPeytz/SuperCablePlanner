@@ -4,7 +4,7 @@
  */
 export default function Legend() {
   return (
-    <div className="panel" style={{ borderBottom: 'none' }}>
+    <div className="panel" data-tour="legend" style={{ borderBottom: 'none' }}>
       <h3 className="panel-title">Legend</h3>
       <div className="legend-grid">
         <LegendLine color="#f59e0b" dash="2 7" label="Existing HV cable" />

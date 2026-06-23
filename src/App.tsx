@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type {
   ConsiderationKey,
   LayerKey,
@@ -17,6 +17,73 @@ import RouteCard from './components/RouteCard'
 import RouteComparison from './components/RouteComparison'
 import ComplianceReport from './components/ComplianceReport'
 import MapNote from './components/MapNote'
+import Tour from './components/Tour'
+import type { TourStep } from './components/Tour'
+
+const TOUR_SEEN_KEY = 'scp.tourSeen.v1'
+
+const TOUR_STEPS: TourStep[] = [
+  {
+    selector: null,
+    icon: '⚡',
+    title: 'Welcome to SuperCablePlanner',
+    body: 'A decision-support prototype for routing superconducting power cables across a city. This quick tour shows you around — use the ← → arrow keys or the buttons to move through it.',
+  },
+  {
+    selector: '[data-tour="map"]',
+    icon: '🗺️',
+    title: 'The planning map',
+    body: 'A stylized map of Copenhagen with city blocks, streets, water, the existing grid and key infrastructure. Hover any icon, zone or line for details, and click a coloured route to inspect it.',
+  },
+  {
+    selector: '[data-tour="layers"]',
+    icon: '🔀',
+    title: 'Map layers',
+    body: 'Switch layers on and off to focus the map — existing cables, heavy electricity users, hospitals, protected zones, roadworks, underground utilities, proposed routes and conflict warnings.',
+  },
+  {
+    selector: '[data-tour="considerations"]',
+    icon: '⚖️',
+    title: 'Considerations',
+    body: 'Include or exclude the factors used to score the routes. Turning one off removes it from the comparison table — so you can weigh options around what matters most for your project.',
+  },
+  {
+    selector: '[data-tour="legend"]',
+    icon: '🧭',
+    title: 'Legend',
+    body: 'A key to every symbol, line style and zone colour on the map — handy as a reference while you present.',
+  },
+  {
+    selector: '[data-tour="routes"]',
+    icon: '🛣️',
+    title: 'Proposed routes',
+    body: 'Three candidate corridors — shortest, most sustainable, and highest-reliability. Click a card to select it: the map highlights that route and its conflicts, and the card expands with reasoning and risks.',
+  },
+  {
+    selector: '[data-tour="comparison"]',
+    icon: '📊',
+    title: 'Route comparison',
+    body: 'A side-by-side table of the routes. The best value in each row is starred ★ and the selected route’s column is highlighted. Click a column header to select that route.',
+  },
+  {
+    selector: '[data-tour="toolbar"]',
+    icon: '✏️',
+    title: 'Draw & annotate',
+    body: 'Use “Draw Route” to sketch your own corridor by clicking points on the map (Clear removes it), and “Add note” to drop a labelled annotation anywhere on the map.',
+  },
+  {
+    selector: '[data-tour="report"]',
+    icon: '📋',
+    title: 'Compliance report',
+    body: 'Generate a mock compliance report for the selected route — constraint checks, detected conflicts, protected zones avoided, a public-acceptance estimate and a recommendation summary.',
+  },
+  {
+    selector: null,
+    icon: '✅',
+    title: 'You’re ready to plan',
+    body: 'That’s the whole workflow. Replay this tour anytime from the “?” button in the top-right. Happy routing!',
+  },
+]
 
 // initial layer visibility — everything on for an impactful first impression
 const initialLayers = Object.fromEntries(LAYERS.map((l) => [l.key, true])) as Record<LayerKey, boolean>
@@ -43,6 +110,16 @@ export default function App() {
 
   // compliance report
   const [reportOpen, setReportOpen] = useState(false)
+
+  // guided tour
+  const [tourOpen, setTourOpen] = useState(false)
+  useEffect(() => {
+    if (!localStorage.getItem(TOUR_SEEN_KEY)) setTourOpen(true)
+  }, [])
+  function closeTour() {
+    setTourOpen(false)
+    localStorage.setItem(TOUR_SEEN_KEY, '1')
+  }
 
   const selectedRoute = PROPOSED_ROUTES.find((r) => r.id === selectedRouteId) ?? null
 
@@ -119,11 +196,20 @@ export default function App() {
         <div className="topbar-actions" style={{ marginLeft: 14 }}>
           <button
             className="btn ghost-light"
+            data-tour="report"
             onClick={() => setReportOpen(true)}
             disabled={!selectedRoute}
             title={selectedRoute ? 'Generate compliance report' : 'Select a route first'}
           >
             📋 Compliance Report
+          </button>
+          <button
+            className="btn ghost-light help-btn"
+            onClick={() => setTourOpen(true)}
+            title="How to use this app — start the guided tour"
+            aria-label="Start guided tour"
+          >
+            ?
           </button>
         </div>
       </header>
@@ -137,7 +223,7 @@ export default function App() {
         />
 
         <main className="col-center">
-          <div className="map-toolbar">
+          <div className="map-toolbar" data-tour="toolbar">
             <button className={`btn sm ${drawMode ? 'active' : ''}`} onClick={toggleDrawMode}>
               ✏️ {drawMode ? 'Drawing…' : 'Draw Route'}
             </button>
@@ -184,7 +270,7 @@ export default function App() {
         </main>
 
         <aside className="col col-right">
-          <div className="panel">
+          <div className="panel" data-tour="routes">
             <h3 className="panel-title">
               Proposed routes
               <span className="count">{PROPOSED_ROUTES.length}</span>
@@ -220,6 +306,8 @@ export default function App() {
       )}
 
       {noteModalOpen && <MapNote onClose={() => setNoteModalOpen(false)} onArm={armNote} />}
+
+      {tourOpen && <Tour steps={TOUR_STEPS} onClose={closeTour} />}
     </div>
   )
 }
