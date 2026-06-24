@@ -18,6 +18,7 @@ import {
   ROADWORKS,
   UTILITIES,
 } from '../data/mockData'
+import { CUSTOM_ROUTE_ID } from '../data/customRoute'
 
 const VIEW = 1000 // SVG coordinate space (square)
 
@@ -358,19 +359,30 @@ export default function MapView({
           ))}
 
         {/* Custom drawn route */}
-        {customRoute.length > 0 && (
-          <g>
-            <path d={toPath(customRoute)} fill="none" stroke="#0b1b33" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="9 5" />
-            {customRoute.map((p, i) => (
-              <circle key={i} cx={p.x} cy={p.y} r={5} fill="#fff" stroke="#0b1b33" strokeWidth={2.5} />
-            ))}
-            {customRoute.length > 0 && (
+        {customRoute.length > 0 && (() => {
+          const selected = selectedRouteId === CUSTOM_ROUTE_ID
+          return (
+            <g
+              onClick={(e) => {
+                if (drawMode || noteMode) return
+                e.stopPropagation()
+                onSelectRoute(CUSTOM_ROUTE_ID)
+              }}
+              style={{ cursor: drawMode || noteMode ? 'crosshair' : 'pointer' }}
+            >
+              {selected && (
+                <path d={toPath(customRoute)} fill="none" stroke="#fff" strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" opacity={0.55} />
+              )}
+              <path d={toPath(customRoute)} fill="none" stroke="#0b1b33" strokeWidth={selected ? 5 : 3.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="9 5" />
+              {customRoute.map((p, i) => (
+                <circle key={i} cx={p.x} cy={p.y} r={selected ? 6 : 5} fill="#fff" stroke="#0b1b33" strokeWidth={2.5} />
+              ))}
               <text x={customRoute[0].x + 9} y={customRoute[0].y - 9} fontSize="13" fontWeight="700" fill="#0b1b33">
                 Custom
               </text>
-            )}
-          </g>
-        )}
+            </g>
+          )
+        })()}
       </svg>
 
       {/* HTML overlays (notes + tooltip) positioned via percentage */}

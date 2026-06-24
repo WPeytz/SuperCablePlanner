@@ -11,6 +11,7 @@ import {
   LAYERS,
   PROPOSED_ROUTES,
 } from './data/mockData'
+import { buildCustomRoute, CUSTOM_ROUTE_ID } from './data/customRoute'
 import Sidebar from './components/Sidebar'
 import MapView from './components/MapView'
 import RouteCard from './components/RouteCard'
@@ -121,15 +122,26 @@ export default function App() {
     localStorage.setItem(TOUR_SEEN_KEY, '1')
   }
 
-  const selectedRoute = PROPOSED_ROUTES.find((r) => r.id === selectedRouteId) ?? null
+  // Synthesize a ProposedRoute (+ conflicts) from the hand-drawn corridor so it
+  // can be compared alongside the canned candidates. Recomputed as points change.
+  const custom = useMemo(() => buildCustomRoute(customRoute), [customRoute])
 
-  // group conflicts by route once
+  // All routes available to the comparison / selection / report flow.
+  const allRoutes = useMemo(
+    () => (custom ? [...PROPOSED_ROUTES, custom.route] : PROPOSED_ROUTES),
+    [custom],
+  )
+
+  const selectedRoute = allRoutes.find((r) => r.id === selectedRouteId) ?? null
+
+  // group conflicts by route (including the custom route's estimated conflicts)
   const conflictsByRoute = useMemo(() => {
     const map: Record<string, typeof CONFLICTS> = {}
     for (const r of PROPOSED_ROUTES) map[r.id] = []
     for (const c of CONFLICTS) (map[c.routeId] ??= []).push(c)
+    if (custom) map[custom.route.id] = custom.conflicts
     return map
-  }, [])
+  }, [custom])
 
   // conflicts shown on the map: those of the selected route (or all if none selected)
   const visibleConflicts = useMemo(() => {
@@ -151,6 +163,8 @@ export default function App() {
   }
   function clearCustomRoute() {
     setCustomRoute([])
+    // If the now-removed custom route was selected, fall back to a real route.
+    setSelectedRouteId((id) => (id === CUSTOM_ROUTE_ID ? 'route-b' : id))
   }
   function toggleDrawMode() {
     setDrawMode((d) => {
@@ -261,7 +275,7 @@ export default function App() {
           />
 
           <RouteComparison
-            routes={PROPOSED_ROUTES}
+            routes={allRoutes}
             conflictsByRoute={conflictsByRoute}
             selectedRouteId={selectedRouteId}
             activeConsiderations={activeConsiderations}
